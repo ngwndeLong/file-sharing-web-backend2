@@ -18,7 +18,7 @@ func NewSQLUserRepository(DB *sql.DB) UserRepository {
 }
 
 func (ur *SQLUserRepository) Create(user *domain.User) error {
-	row := ur.db.QueryRow("INSERT INTO users (name, password, Email, Role, enableTOTP) VALUES ($1, $2, $3, $4, $5) RETURNING user_id", user.Username, user.Password, user.Email, user.Role, user.EnableTOTP)
+	row := ur.db.QueryRow("INSERT INTO users (username, password, email, role, enableTOTP) VALUES ($1, $2, $3, $4, $5) RETURNING id", user.Username, user.Password, user.Email, user.Role, user.EnableTOTP)
 	err := row.Scan(&user.Id)
 
 	if err != nil {

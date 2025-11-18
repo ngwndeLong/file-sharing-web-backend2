@@ -9,6 +9,7 @@ CREATE TABLE users (
     password TEXT NOT NULL CHECK (length(password) >= 6),
     email TEXT NOT NULL,
     role TEXT NOT NULL,
+    enabletotp BOOLEAN DEFAULT FALSE,
     CONSTRAINT users_username_key UNIQUE(username),
     CONSTRAINT users_mail_key UNIQUE(email)
 );
