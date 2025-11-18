@@ -1,5 +1,7 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(100) NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -8,8 +10,9 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 
-INSERT INTO users (username, password, email, role)
-VALUES 
-    ('giang', '123456', 'giang@example.com', 'admin'),
-    ('tuan', 'abcdef', 'tuan@example.com', 'user'),
-    ('haixon', 'password', 'haixon@example.com', 'user');
+CREATE TABLE IF NOT EXISTS jwt_blacklist (
+    id SERIAL PRIMARY KEY,
+    token TEXT NOT NULL,
+    expired_at TIMESTAMP NOT NULL
+);
+
