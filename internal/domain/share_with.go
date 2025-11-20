@@ -9,3 +9,8 @@ type SharedWith struct {
 	SharedAt   time.Time `json:"sharedAt" db:"shared_at"`
 	Permission string    `json:"permission" db:"permission"` // Ví dụ: read, write
 }
+
+type Shared struct {
+	FileId  string   `json:"fileId"`
+	UserIds []string `json:"userIds"`
+}

@@ -137,7 +137,62 @@ func (r *fileRepository) GetFileByID(ctx context.Context, id string) (*domain.Fi
 
 func (r *fileRepository) GetFileByToken(ctx context.Context, token string) (*domain.File, error) {
 	// SELECT * FROM files WHERE share_token = $1
-	return nil, sql.ErrNoRows // Mô phỏng
+
+	// return nil, sql.ErrNoRows // Mô phỏng
+
+	query := `
+		SELECT 
+			id, user_id, name, type, size, share_token, 
+			password, available_from, available_to, enable_totp, created_at
+		FROM files
+		WHERE share_token = $1
+	`
+
+	var file domain.File
+
+	// Khai báo các biến sql.NullXxx cho các cột có thể NULL
+	var ownerID sql.NullString
+	var passwordHash sql.NullString
+
+	row := r.db.QueryRowContext(ctx, query, token)
+
+	err := row.Scan(
+		&file.Id,
+		&ownerID,       // user_id (NULLable)
+		&file.FileName, // name
+		&file.MimeType, // type
+		&file.FileSize, // size
+		&file.ShareToken,
+		&passwordHash, // password (NULLable)
+		&file.AvailableFrom,
+		&file.AvailableTo,
+		&file.EnableTOTP,
+		&file.CreatedAt,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, err // Trả về sql.ErrNoRows nếu không tìm thấy
+		}
+		return nil, err
+	}
+
+	// Xử lý giá trị NULL sau khi Scan
+	if ownerID.Valid {
+		file.OwnerId = &ownerID.String
+	} else {
+		file.OwnerId = nil
+	}
+
+	if passwordHash.Valid {
+		file.PasswordHash = &passwordHash.String
+		file.HasPassword = true
+	} else {
+		file.PasswordHash = nil
+		file.HasPassword = false
+	}
+
+	return &file, nil
 }
 
 func (r *fileRepository) DeleteFile(ctx context.Context, id string, userID string) error {

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"mime/multipart"
+	"slices"
+
 	"time"
 
 	"github.com/dath-251-thuanle/file-sharing-web-backend2/config"
@@ -22,7 +24,7 @@ type FileService interface {
 	UploadFile(ctx context.Context, fileHeader *multipart.FileHeader, req *dto.UploadRequest, ownerID *string) (*domain.File, error)
 	GetMyFiles(ctx context.Context, userID string, params domain.ListFileParams) (interface{}, error)
 	DeleteFile(ctx context.Context, fileID string, userID string) error
-	// GetFileInfo(ctx context.Context, token string) (*domain.File, error) // Cần cho download
+	GetFileInfo(ctx context.Context, token string, userID string) (interface{}, error) // Cần cho download
 }
 
 type fileService struct {
@@ -207,4 +209,31 @@ func (s *fileService) DeleteFile(ctx context.Context, fileID string, userID stri
 	}
 
 	return nil
+}
+
+func (s *fileService) GetFileInfo(ctx context.Context, token string, userID string) (interface{}, error) {
+	file, err := s.fileRepo.GetFileByToken(ctx, token)
+
+	if err != nil {
+		return nil, utils.WrapError(err, "Failed to get file", utils.ErrCodeNotFound)
+	}
+
+	shareds, err := s.sharedRepo.GetUsersSharedWith(ctx, file.Id)
+	if err != nil {
+		return nil, utils.WrapError(err, "Failed to get shared list", utils.ErrCodeInternal)
+	}
+
+	if !file.IsPublic {
+		if slices.Contains(shareds.UserIds, userID) || *file.OwnerId == userID {
+			return gin.H{
+				"file": file,
+			}, nil
+		}
+
+		return nil, fmt.Errorf("permission denited to read file")
+	}
+
+	return gin.H{
+		"file": file,
+	}, nil
 }
