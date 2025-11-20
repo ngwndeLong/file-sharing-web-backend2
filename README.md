@@ -136,6 +136,8 @@ CREATE DATABASE "file-sharing";
 
 GRANT ALL PRIVILEGES ON DATABASE "file-sharing" TO haixon;
 
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO haixon;
+
 exit;
 ```
 
