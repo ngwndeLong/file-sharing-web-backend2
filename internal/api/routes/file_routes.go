@@ -31,7 +31,7 @@ func (fr *FileRoutes) Register(r *gin.RouterGroup) {
 		files.DELETE("/:id", fr.handler.DeleteFile)
 
 		// Các routes download công khai và xem thông tin (chưa triển khai đầy đủ)
-		// r.GET("/f/:shareToken", fr.handler.GetFileInfo)
+		files.GET("/:shareToken", fr.handler.GetFileInfo)
 		// r.GET("/f/:shareToken/download", fr.handler.DownloadFile)
 	}
 }

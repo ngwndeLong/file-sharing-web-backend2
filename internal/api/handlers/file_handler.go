@@ -135,3 +135,19 @@ func (fh *FileHandler) GetMyFiles(ctx *gin.Context) {
 
 	utils.ResponseSuccess(ctx, http.StatusOK, "User files retrieved successfully", result)
 }
+
+func (fh *FileHandler) GetFileInfo(ctx *gin.Context) {
+	fileToken := ctx.Param("shareToken")
+	userID, exists := ctx.Get("userID")
+	if !exists {
+		userID = nil
+	}
+
+	result, err := fh.file_service.GetFileInfo(ctx, fileToken, userID.(string))
+	if err != nil {
+		utils.ResponseError(ctx, utils.WrapError(err, "Failed to access file", utils.ErrCodeInternal))
+		return
+	}
+
+	utils.ResponseSuccess(ctx, http.StatusOK, "File retrieved successfully", result)
+}
