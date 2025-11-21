@@ -49,7 +49,7 @@ func (ah *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	user, accessToken, expiresIn, err := ah.auth_service.Login(input.Email, input.Password)
+	user, token, err := ah.auth_service.Login(input.Email, input.Password)
 	if err != nil {
 		utils.ResponseError(ctx, err)
 		return
@@ -57,15 +57,16 @@ func (ah *AuthHandler) Login(ctx *gin.Context) {
 
 	if user.EnableTOTP {
 		ctx.JSON(http.StatusOK, gin.H{
-			"requireTOTP": true,
+			"requireTOTP": user.EnableTOTP,
+			"id":          user.Id,
+			"cid":         token,
 			"message":     "TOTP verification required",
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"accessToken": accessToken,
-		"expiresIn":   expiresIn,
+		"accessToken": token,
 		"user": gin.H{
 			"id":       user.Id,
 			"username": user.Username,
@@ -93,7 +94,7 @@ func (ah *AuthHandler) LoginTOTP(ctx *gin.Context) {
 		return
 	}
 
-	user, accessToken, _, err := ah.auth_service.Login(input.Email, input.Password)
+	user, accessToken, err := ah.auth_service.Login(input.Email, input.Password)
 	if err != nil {
 		utils.ResponseError(ctx, err)
 		return
@@ -102,8 +103,11 @@ func (ah *AuthHandler) LoginTOTP(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"accessToken": accessToken,
 		"user": gin.H{
-			"id":       user.Id,
-			"username": user.Username,
+			"id":          user.Id,
+			"username":    user.Username,
+			"email":       user.Email,
+			"role":        "user",
+			"totpEnabled": true,
 		},
 	})
 }

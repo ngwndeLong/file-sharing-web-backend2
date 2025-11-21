@@ -1,7 +1,7 @@
 package domain
 
 type User struct {
-	Id         string `json:"userid"`
+	Id         string `json:"id"`
 	Username   string `json:"username" `
 	Password   string `json:"password" `
 	Email      string `json:"email" `
@@ -11,7 +11,7 @@ type User struct {
 }
 
 type UserCreate struct {
-	Username   string `json:"username" binding:"required"`
-	Email      string `json:"email" binding:"required"`
-	Password   string `json:"password" binding:"required"`
+	Username string `json:"username" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
