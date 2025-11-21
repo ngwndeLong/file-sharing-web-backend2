@@ -88,7 +88,7 @@ func (as *authService) Logout(ctx *gin.Context) error {
 }
 
 func (as *authService) SetupTOTP(userID string) (*TOTPSetupResponse, error) {
-	const appName = "FileSharingApp"
+	const appName = "file-sharing"
 	key, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      appName,
 		AccountName: fmt.Sprintf("user-%s", userID),
