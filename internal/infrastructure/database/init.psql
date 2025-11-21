@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     role VARCHAR(50) NOT NULL,
-    enableTOTP BOOLEAN DEFAULT FALSE
+    enableTOTP BOOLEAN DEFAULT FALSE,
+    secretTOTP VARCHAR(255)
 );
 
 CREATE TABLE files (
@@ -47,3 +48,8 @@ CREATE TABLE IF NOT EXISTS jwt_blacklist (
     token TEXT NOT NULL,
     expired_at TIMESTAMP NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS usersLoginSession (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    cid UUID NOT NULL
+)

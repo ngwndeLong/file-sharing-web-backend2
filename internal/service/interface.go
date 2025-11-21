@@ -15,8 +15,9 @@ type UserService interface {
 
 type AuthService interface {
 	CreateUser(username, password, email string) (*domain.User, error)
-	Login(email, password string) (user *domain.User, accessToken string, expiresIn int, err error)
-	Logout(ctx *gin.Context) error
+	Login(email, password string) (user *domain.User, accessToken string, err error)
+	LoginTOTP(email, totpCode string) (*domain.User, string, error)
+ 	Logout(ctx *gin.Context) error
 }
 
 type AdminService interface {

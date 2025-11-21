@@ -11,6 +11,7 @@ import (
 	"github.com/dath-251-thuanle/file-sharing-web-backend2/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/pquerna/otp/totp"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -51,27 +52,57 @@ func (us *authService) CreateUser(username, password, email string) (*domain.Use
 	return us.authRepo.Create(user)
 }
 
-func (as *authService) Login(email, password string) (*domain.User, string, int, error) {
+func (as *authService) Login(email, password string) (*domain.User, string, error) {
 	email = utils.NormalizeString(email)
 	user := &domain.User{}
 	err := as.userRepo.FindByEmail(email, user)
 	if err != nil {
 		fmt.Println("Login failed: User not found")
-		return nil, "", 0, utils.NewError("Invalid email or password", utils.ErrCodeUnauthorized)
+		return nil, "", utils.NewError("Invalid email or password", utils.ErrCodeUnauthorized)
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return nil, "", 0, errors.New("invalid email or password")
+		return nil, "", errors.New("invalid email or password")
+	}
+
+	if user.EnableTOTP {
+		cid, err := uuid.NewUUID()
+		if err != nil {
+			return nil, "", utils.NewError("Failed to generate CID", utils.ErrCodeInternal)
+		}
+		err = as.userRepo.AddTimestamp(user.Id, cid.String())
+		if err != nil {
+			return nil, "", utils.NewError("Failed to add timestamp", utils.ErrCodeInternal)
+		}
+		return user, cid.String(), nil
 	}
 
 	accessToken, err := as.tokenService.GenerateAccessToken(*user)
 
 	if err != nil {
 		fmt.Println("Error generating access token:", err)
-		return nil, "", 0, utils.NewError("Failed to generate access token", utils.ErrCodeInternal)
+		return nil, "", utils.NewError("Failed to generate access token", utils.ErrCodeInternal)
 	}
 
-	return user, accessToken, int(jwt.AccessTokenTTL.Seconds()), nil
+	return user, accessToken, nil
+
+}
+
+func (as *authService) LoginTOTP(email, totpCode string) (*domain.User, string, error) {
+	user := &domain.User{}
+	secret := user.SecretTOTP
+	if !totp.Validate(totpCode, secret) {
+		return nil, "", utils.NewError("Invalid or expired TOTP code", utils.ErrCodeUnauthorized)
+	}
+
+	accessToken, err := as.tokenService.GenerateAccessToken(*user)
+
+	if err != nil {
+		fmt.Println("Error generating access token:", err)
+		return nil, "", utils.NewError("Failed to generate access token", utils.ErrCodeInternal)
+	}
+
+	return user, accessToken, nil
 
 }
 
