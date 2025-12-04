@@ -12,10 +12,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.25.4
+      - name: Check Go
+        run: go version
 
       - name: Create .env from secrets
         run: |
