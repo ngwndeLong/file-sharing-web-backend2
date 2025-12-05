@@ -17,29 +17,15 @@ jobs:
       - name: Check Go
         run: go version
 
-      - name: Load AGE private key
-        run: |
-          echo "${{ secrets.SOPS_AGE_KEY }}" > age.key
-          chmod 600 age.key
-        env:
-          SOPS_AGE_KEY_FILE: age.key
-
       - name: Decrypt .env
         run: |
+          echo "${{ secrets.SOPS_AGE_KEY }}" > age.key
           sops --decrypt --input-type dotenv --output-type dotenv --output .env dev.enc
         env:
           SOPS_AGE_KEY_FILE: age.key
 
       - name: Start containers
         run: docker compose up -d
-
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          echo "Waiting for PostgreSQL..."
-          until docker exec postgres-db pg_isready -U "$DB_USER" -d "$DB_NAME"; do
-            sleep 2
-          done
-          echo "PostgreSQL is ready"
 
       - name: Build Go application
         run: go build -v ./...
