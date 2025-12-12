@@ -272,7 +272,8 @@ func (fh *FileHandler) PreviewFile(ctx *gin.Context) {
 	password := ctx.Query("password")
 	userID, exists := ctx.Get("userID")
 	if !exists {
-		userID = nil
+		utils.ResponseMsg(utils.ErrCodeGetForbidden, "You do not have permission to view this file").Export(ctx)
+		return
 	}
 
 	info, file, download_err := fh.file_service.DownloadFile(ctx, fileToken, userID.(string), password)
@@ -288,13 +289,8 @@ func (fh *FileHandler) PreviewFile(ctx *gin.Context) {
 	}
 
 	ctx.Header("Content-Disposition", "inline; filename=\""+info.FileName+"\"")
-	ctx.Header("Content-Type", info.MimeType)
-
-	extraHeaders := map[string]string{
-		"Content-Disposition": `inline; filename="` + info.FileName + `"`,
-	}
-
-	ctx.DataFromReader(http.StatusOK, int64(len(fileBytes)), info.MimeType, file, extraHeaders)
+	ctx.Data(http.StatusOK, info.MimeType, fileBytes)
+	//ctx.DataFromReader(http.StatusOK, int64(len(fileBytes)), info.MimeType, file, extraHeaders)
 }
 
 func (fh *FileHandler) GetFileDownloadHistory(ctx *gin.Context) {
