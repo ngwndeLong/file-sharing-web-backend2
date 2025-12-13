@@ -489,7 +489,7 @@ paths:
         **Bao gồm:**
         - Danh sách file kèm metadata (status, thời gian hiệu lực, bảo mật, ...)
         - Pagination (`page`, `limit`) và tổng số file
-        - Summary (đếm active/pending/expired/deleted)
+        - Summary (đếm active/pending/expired)
       security:
         - BearerAuth: []
       parameters:
@@ -498,7 +498,7 @@ paths:
           description: Lọc theo trạng thái file
           schema:
             type: string
-            enum: [active, expired, pending, deleted, all]
+            enum: [active, expired, pending, all]
             default: all
         - name: page
           in: query
@@ -560,7 +560,7 @@ paths:
                       activeFiles: 28
                       pendingFiles: 5
                       expiredFiles: 9
-                      deletedFiles: 0
+                      
         "401":
           $ref: "#/components/responses/Unauthorized"
 
