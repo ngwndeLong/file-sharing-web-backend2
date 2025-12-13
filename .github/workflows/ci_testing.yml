@@ -16,11 +16,12 @@ jobs:
       - name: Check Go
         run: go version
 
-      - name: Cleanup old containers & volumes
-        run: docker compose down -v
-
       - name: Build & start containers
         run: docker compose up -d --build
 
       - name: Run tests
         run: go test -v ./test
+
+      - name: Cleanup
+        if: always()
+        run: docker compose down -v
