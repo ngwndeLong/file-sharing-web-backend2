@@ -222,8 +222,7 @@ func TestDownload_TimeRestricted(t *testing.T) {
 
 		rec := httptest.NewRecorder()
 		TestApp.Router().ServeHTTP(rec, req)
-		// Check for error code (400 or 410 depending on implementation)
-		assert.Contains(t, []int{400, 410, 422}, rec.Code)
+		assert.Equal(t, 410, rec.Code)
 	})
 
 	// Case 3: Owner Bypass

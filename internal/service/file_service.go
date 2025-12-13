@@ -288,12 +288,13 @@ func (s *fileService) getFileInfo(ctx context.Context, id string, userID string,
 			if !slices.Contains(shareds.UserIds, userID) {
 				return nil, nil, nil, utils.Response(utils.ErrCodeGetForbidden)
 			}
-
+		}
+		if *file.OwnerId != userID {
 			if file.Status == domain.FILE_EXPIRED {
 				return nil, nil, nil, utils.ResponseArgs(utils.ErrCodeFileExpired,
 					gin.H{
-						"error":   "File expired",
-						"message": "File has expired",
+						"error":     "File expired",
+						"expiredAt": file.AvailableTo,
 					},
 				)
 			}
@@ -301,12 +302,14 @@ func (s *fileService) getFileInfo(ctx context.Context, id string, userID string,
 			if file.Status == domain.FILE_PENDING {
 				return nil, nil, nil, utils.ResponseArgs(utils.ErrCodeFileLocked,
 					gin.H{
+						"error":               "File not yet available",
 						"availableFrom":       file.AvailableFrom,
 						"hoursUntilAvailable": file.AvailableFrom.Sub(now).Hours(),
 					},
 				)
 			}
 		}
+
 	}
 
 	outShared := []string{}
