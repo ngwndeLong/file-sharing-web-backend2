@@ -165,9 +165,9 @@ make deps          # Tải dependencies
 | 2311906 | Nguyễn Hoàng Long | Nhóm B |
 | 2312955 | Đặng Hải Sơn | Nhóm B, Use Case Diagram |
 
-**Nhóm A:** Database Design, API (Admin, System Management, File Management)
+**Nhóm A:** Database Design, API (Admin/System Management, File Management, Statistics & Analytics)
 
-**Nhóm B:** API (Authentication, User Management, Statistics & Analytics)
+**Nhóm B:** API (Authentication, User Management, CI/CD)
 
 ---
 
