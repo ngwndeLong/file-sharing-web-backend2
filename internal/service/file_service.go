@@ -249,10 +249,6 @@ func (s *fileService) getFileInfo(ctx context.Context, id string, userID string,
 		return nil, nil, nil, err
 	}
 
-	if userID == "" {
-		return file, nil, nil, nil
-	}
-
 	now := time.Now()
 
 	file.Status = domain.FILE_ACTIVE
@@ -262,10 +258,14 @@ func (s *fileService) getFileInfo(ctx context.Context, id string, userID string,
 	} else if now.After(file.AvailableTo) {
 		file.Status = domain.FILE_EXPIRED
 	}
+
 	requester := domain.User{}
-	if err := s.userRepo.FindById(userID, &requester); err != nil {
-		return nil, nil, nil, err
+	if userID != "" {
+		if err := s.userRepo.FindById(userID, &requester); err != nil {
+			return nil, nil, nil, err
+		}
 	}
+
 	isAdmin := requester.Role == "admin"
 	owner_ := domain.User{}
 	var owner *domain.User = nil

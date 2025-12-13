@@ -206,18 +206,6 @@ func (fh *FileHandler) GetFileInfoVerbose(ctx *gin.Context) {
 		return
 	}
 
-	if owner.Role != "admin" {
-		if owner == nil {
-			utils.Response(utils.ErrCodeGetForbidden).Export(ctx)
-			return
-		}
-
-		if owner.Id != userID {
-			utils.Response(utils.ErrCodeGetForbidden).Export(ctx)
-			return
-		}
-	}
-
 	out := gin.H{
 		"id":          file.Id,
 		"fileName":    file.FileName,
