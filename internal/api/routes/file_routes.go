@@ -27,7 +27,7 @@ func (fr *FileRoutes) Register(r *gin.RouterGroup) {
 
 		optional.GET("/:shareToken/download", fr.handler.DownloadFile)
 
-		optional.GET("/available", fr.handler.GetAllAccessibleFiles)
+		optional.GET("/available", fr.handler.GetAccessibleFiles)
 	}
 	protected := files.Group("/")
 	protected.Use(middleware.AuthMiddleware())

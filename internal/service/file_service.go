@@ -445,8 +445,8 @@ func (s *fileService) GetFileStats(ctx context.Context, fileID, userID string) (
 	return s.fileRepo.GetFileStats(ctx, fileID)
 }
 
-func (s *fileService) GetAllAccessibleFiles(ctx context.Context, userID *string) ([]dto.AccessibleFile, *utils.ReturnStatus) {
-	files, err := s.fileRepo.GetAllAccessibleFiles(ctx, userID)
+func (s *fileService) GetAccessibleFiles(ctx context.Context, userID string) ([]dto.AccessibleFile, *utils.ReturnStatus) {
+	files, err := s.fileRepo.GetAccessibleFiles(ctx, userID)
 
 	if err != nil {
 		return nil, err
