@@ -37,7 +37,7 @@ func (fr *FileRoutes) Register(r *gin.RouterGroup) {
 
 		// Sử dụng ID.
 		protected.DELETE("/info/:id", fr.handler.DeleteFile)
-		protected.GET("info/:id", fr.handler.GetFileInfoVerbose)
+		protected.GET("/info/:id", fr.handler.GetFileInfoVerbose)
 		protected.GET("/stats/:id", fr.handler.GetFileStats)
 		protected.GET("/download-history/:id", fr.handler.GetFileDownloadHistory)
 	}
